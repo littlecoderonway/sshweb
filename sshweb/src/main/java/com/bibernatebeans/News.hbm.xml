@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 2014-12-17 11:19:13 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="com.hibernatebeans.News" table="news" catalog="test" optimistic-lock="version">
+        <id name="newsId" type="int">
+            <column name="newsId" />
+            <generator class="assigned" />
+        </id>
+        <property name="newsName" type="string">
+            <column name="newsName" />
+        </property>
+        <property name="newsSource" type="string">
+            <column name="newsSource" />
+        </property>
+        <property name="newsDetail" type="string">
+            <column name="newsDetail" />
+        </property>
+        <property name="newsTime" type="timestamp">
+            <column name="newsTime" length="19" />
+        </property>
+    </class>
+</hibernate-mapping>

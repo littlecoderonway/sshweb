@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="GBK"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	http://www.springframework.org/schema/aop 
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<!-- 指定连接数据库的驱动 -->
+		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+		<!-- 指定连接数据库的URL -->
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/test"/>
+		<!-- 指定连接数据库的用户名 -->
+		<property name="user" value="root"/>
+		<!-- 指定连接数据库的密码 -->
+		<property name="password" value="huhu"/>
+		<!-- 指定连接数据库连接池的最大连接数 -->
+		<property name="maxPoolSize" value="40"/>
+		<!-- 指定连接数据库连接池的最小连接数 -->
+		<property name="minPoolSize" value="1"/>
+		<!-- 指定连接数据库连接池的初始化连接数 -->
+		<property name="initialPoolSize" value="1"/>
+		<!-- 指定连接数据库连接池的连接的最大空闲时间 -->
+		<property name="maxIdleTime" value="20"/>
+	</bean>
+
+	<!-- 定义Hibernate的SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<!-- 依赖注入数据源，注入正是上面定义的dataSource -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- mappingResouces属性用来列出全部映射文件 -->
+		<property name="mappingLocations">
+     	<list>
+         <value>classpath:/com/way/sshweb/beans/*.hbm.xml</value>
+     	</list>
+		</property>
+		<!-- 定义Hibernate的SessionFactory的属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 指定数据库方言 -->
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQL5InnoDBDialect</prop>
+				<!-- 是否根据需要每次自动创建数据库 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<!-- 显示Hibernate持久化操作所生成的SQL -->
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- 将SQL脚本进行格式化后再输出 -->
+				<prop key="hibernate.format_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource">
+        	<ref bean="dataSource"/>
+        </property>
+    </bean>
+
+<!-- 配置Hibernate的局部事务管理器，使用HibernateTransactionManager类 -->
+<!-- 该类实现PlatformTransactionManager接口，是针对Hibernate的特定实现-->
+<bean id="transactionManager" class=
+	"org.springframework.orm.hibernate4.HibernateTransactionManager">
+	<!-- 配置HibernateTransactionManager时需要依注入SessionFactory的引用 -->
+	<property name="sessionFactory" ref="sessionFactory"/>
+</bean>
+
+ 	<aop:config>       
+        <aop:advisor id="managerTx" advice-ref="txAdvice" pointcut="execution(* com.way.sshweb.ilogic.INewsLogic.*(..))" 
+        order="1"/>
+    </aop:config>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED" read-only="true"/>
+            <tx:method name="create*" propagation="REQUIRED" read-only="false" />
+            <tx:method name="save*" propagation="REQUIRED" read-only="false" />
+            <tx:method name="update*" propagation="REQUIRED" read-only="false" />
+            <tx:method name="delete*" propagation="REQUIRED" read-only="false" />
+            <tx:method name="add*" propagation="REQUIRED" read-only="false" />
+        </tx:attributes>
+    </tx:advice>
+
+<!-- dao配置 -->
+	<!-- 分页dao -->
+	<!-- 
+	<bean id="pageHelpDAO" class="com.travel.dao.PageHelpDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+ -->
+	<bean id="NewsDAO" class="com.way.sshweb.dao.NewsDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	
+
+<!-- logic配置 -->
+
+	<bean id="newsLogic" class="com.way.sshweb.logic.NewsLogic">
+		<property name="newsDAO">
+			<ref bean="NewsDAO"/>
+		</property>
+	</bean>
+
+</beans>
+
+
+
+
+
+
+
+
+

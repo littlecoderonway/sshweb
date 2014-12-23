@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<!-- struts为配置文件根元素-->
+<struts>
+	<constant name="struts.custom.i18n.resources" value="resource"/>
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+	
+	<constant name="struts.ui.theme" value="simple" /> 
+	<constant name="struts.ui.templateDir" value="template" /> 
+	<constant name="struts.ui.templateSuffix" value="ftl" /> 
+	<constant name="struts.devMode" value="true" />
+	
+	<!-- Action必须放在指定的包名空间中-->
+	<package name="sshweb" extends="json-default">
+         <action name="*News" class="com.way.sshweb.actions.NewsAction" method="{1}">
+         	<result name="newsJson" type="json">
+				<param name="root">jsonMap</param>
+         	</result>
+         	<result name ="success">/input.jsp</result>
+         </action>
+
+	</package>
+</struts>
+<!-- 本文件配置了Action的转向 -->
